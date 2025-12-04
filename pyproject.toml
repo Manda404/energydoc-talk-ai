@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "energydoc-talk-ai"
+version = "0.1.0"
+description = "EnergyDocTalk AI - Assistant RAG pour interagir avec les documents PDF de l'entreprise via Streamlit"
+authors = ["Manda Surel <s239150.eps@gmail.com>"]
+packages = [{ include = "energydoc_talk_ai", from = "src" }]
+
+[tool.poetry.dependencies]
+# ---- Version Python compatible avec LangChain / Pinecone ----
+python = ">=3.10,<3.13"
+
+# ---- Logging & Settings ----
+pydantic-settings = "^2.12.0"
+loguru = "^0.7.0"
+
+# ---- LangChain & Intégrations LLM / RAG ----
+langchain = "^0.2.0"
+langchain-community = "^0.2.0"
+langchain-pinecone = "^0.1.0"
+langchain-google-genai = "^1.0.0"
+langchain-groq = "^0.1.0"
+
+# --- Extraction de données / PDF ---
+pymupdf = "^1.26.6"
+pypdf = "^4.0.0"
+
+# ---- Vector Store (Pinecone) ----
+pinecone-client = "^5.0.0"
+
+# ---- Utils ----
+python-dotenv = "^1.0.1"
+numpy = "^1.26.0"
+tqdm = "^4.66.0"
+
+# ---- UI (Streamlit uniquement, pas d'API FastAPI) ----
+streamlit = "^1.39.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.0"
+
+[tool.poetry.group.notebook.dependencies]
+ipywidgets = "^8.1.8"

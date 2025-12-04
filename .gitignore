@@ -1,0 +1,8 @@
+.env
+poetry.lock
+.pytest_cache
+.venv
+/data
+logs
+__pycache__
+dev
