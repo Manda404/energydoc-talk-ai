@@ -39,7 +39,7 @@ def render_sidebar():
             """
             ### 🧠 À propos du projet
 
-            **PDFTalk AI** est un assistant intelligent basé sur une architecture  
+            **EnergyDocTalk AI** est un assistant intelligent basé sur une architecture  
             **RAG (Retrieval-Augmented Generation)** utilisant :
 
             - 📘 Extraction & chunking PDF  
