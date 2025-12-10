@@ -31,7 +31,12 @@ def render_sidebar():
         )
 
         st.markdown("---")
-
+        st.write("### ⚙️ Paramètres de l'application")
+        enable_chat = st.toggle("Activer le Chatbot 🤖")
+        if enable_chat:
+            st.success("✔ Chatbot activé ! Vous pouvez poser vos questions.")
+  
+        st.markdown("---")
         # ------------------------------------------------------------------
         # DESCRIPTION DU PROJET
         # ------------------------------------------------------------------

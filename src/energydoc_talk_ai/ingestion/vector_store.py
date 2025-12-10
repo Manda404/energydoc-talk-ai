@@ -24,6 +24,7 @@ from energydoc_talk_ai.ingestion.embeddings import get_embeddings
 
 
 
+
 # ------------------------------------------------------------------------------
 # Suppression de l’index Pinecone (utilitaire)
 # ------------------------------------------------------------------------------
@@ -229,3 +230,54 @@ def get_vector_store() -> PineconeVectorStore:
         raise
 
     return vector_store
+
+
+# ----------------------------------------------------------------------
+# Vérifie : Vérification de la présence éffective de l'index Pinecone.
+# ----------------------------------------------------------------------
+def check_pinecone_index_exists() -> bool:
+    """
+    Vérifie si l'index Pinecone spécifié dans settings.PINECONE_INDEX_NAME existe.
+
+    Returns
+    -------
+    bool
+        True si l'index existe, False sinon (ou en cas d'erreur fatale).
+    """
+    # Initialisation du logger (peut être optionnel pour une simple vérification)
+    logger = setup_logger(logger_name="check_pinecone_index_exists")
+    
+    logger.info("Démarrage de la vérification de l'existence de l'index Pinecone.")
+
+    # 1. Initialisation du client Pinecone
+    try:
+        pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+        logger.debug("Client Pinecone initialisé.")
+    except Exception as exc:
+        logger.error(f"Impossible d'initialiser le client Pinecone : {exc}")
+        # En cas d'échec d'initialisation, nous ne pouvons pas vérifier l'index.
+        return False
+
+    # 2. Liste des index existants
+    try:
+        # Note : pc.list_indexes() retourne une liste de dictionnaires, d'où [i["name"] for i in ...]
+        existing_indexes = [i["name"] for i in pc.list_indexes()]
+        logger.info(f"Index existants : {existing_indexes}")
+    except Exception as exc:
+        logger.error(f"Impossible de lister les index Pinecone : {exc}")
+        # En cas d'échec de listage, nous considérons que l'existence n'a pas pu être vérifiée.
+        return False
+
+    # 3. Vérification de l'existence de l'index cible
+    index_exists = settings.PINECONE_INDEX_NAME in existing_indexes
+
+    if index_exists:
+        logger.info(
+            f"L'index '{settings.PINECONE_INDEX_NAME}' existe bien. Retourne True."
+        )
+    else:
+        logger.warning(
+            f"L'index '{settings.PINECONE_INDEX_NAME}' n'existe pas. Retourne False."
+        )
+        
+    return index_exists

@@ -8,96 +8,105 @@ BOX_BG = "#4FB713"
 
 
 def render_chat_box():
-    st.header("💬 Discussion avec les PDF")
+    # Utilisation de st.expander pour contenir tout le chat
+    # On le définit comme ouvert (True) pour que l'utilisateur puisse interagir immédiatement.
+    with st.expander("💬 Discussion avec les PDF", expanded=True):
+        
+        # Le st.header a été retiré, le titre de l'expander suffit
+        
+        #if not st.session_state.ingestion_done or not st.session_state.flag_index_exists:
+        if not st.session_state.flag_index_exists:
+            st.warning("⚠️ Tu dois d'abord ingérer des PDFs avant de poser des questions.")
+            return
 
-    if not st.session_state.ingestion_done:
-        st.warning("⚠️ Tu dois d'abord ingérer des PDFs avant de poser des questions.")
-        return
+        # Initialisation du chat
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
 
-    # Initialisation du chat
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
-
-    st.markdown(
-        """
-        <style>
-        .chat-message {
-            padding: 12px;
-            margin: 8px;
-            border-radius: 12px;
-            max-width: 75%;
-        }
-        .user-msg {
-            background-color: #DCF8C6;
-            margin-left: auto;
-            text-align: right;
-        }
-        .assistant-msg {
-            background-color: #F1AE1D;
-            margin-right: auto;
-            text-align: left;
-        }
-        .chat-box {
-            background-color: #F7F7F7;
-            padding: 15px;
-            border-radius: 12px;
-            max-height: 550px;
-            overflow-y: auto;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # Zone chat-box visuelle
-    with st.container():
-        #st.markdown('<div class="chat-box">', unsafe_allow_html=True)
-        st.markdown('<div class="main-header">⚡️ EnergyDoc Chat AI</div>', unsafe_allow_html=True)
-        for msg in st.session_state.messages:
-            if msg["role"] == "user":
-                st.markdown(
-                    f'<div class="chat-message user-msg">🧑 {msg["content"]}</div>',
-                    unsafe_allow_html=True,
-                )
-            else:
-                st.markdown(
-                    f'<div class="chat-message assistant-msg"> 🤖 {msg["content"]}</div>',
-                    unsafe_allow_html=True,
-                )
-
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    # Formulaire d’envoi
-    with st.form(key="chat_form", clear_on_submit=True):
-        user_input = st.text_input("Pose ta question :", "")
-        submitted = st.form_submit_button("Envoyer")
-
-    # Traitement de la question
-    if submitted and user_input:
-        # Ajout du message utilisateur
-        st.session_state.messages.append(
-            {"role": "user", "content": user_input}
+        # --- Styles CSS (inchangés) ---
+        st.markdown(
+            """
+            <style>
+            .chat-message {
+                padding: 12px;
+                margin: 8px;
+                border-radius: 12px;
+                max-width: 75%;
+            }
+            .user-msg {
+                background-color: #DCF8C6;
+                margin-left: auto;
+                text-align: right;
+            }
+            .assistant-msg {
+                background-color: #F1AE1D;
+                margin-right: auto;
+                text-align: left;
+            }
+            .chat-box {
+                background-color: #F7F7F7;
+                padding: 15px;
+                border-radius: 12px;
+                max-height: 550px;
+                overflow-y: auto;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
         )
 
-        rag = get_rag_chain()
+        # Zone chat-box visuelle
+        # Le conteneur et l'affichage des messages sont maintenus dans l'expander
+        with st.container():
+            st.markdown('<div class="main-header">⚡️ EnergyDoc Chat AI</div>', unsafe_allow_html=True)
+            
+            for msg in st.session_state.messages:
+                if msg["role"] == "user":
+                    st.markdown(
+                        f'<div class="chat-message user-msg">🧑 {msg["content"]}</div>',
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    st.markdown(
+                        f'<div class="chat-message assistant-msg"> 🤖 {msg["content"]}</div>',
+                        unsafe_allow_html=True,
+                    )
+            
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        with st.spinner("Analyse des documents…"):
-            result = rag({"query": user_input})
-            #result = chat_rag_client(user_input)
+        # Le formulaire est placé directement sous les messages, toujours dans l'expander
+        with st.form(key="chat_form", clear_on_submit=True):
+            user_input = st.text_input("Pose ta question :", "")
+            submitted = st.form_submit_button("Envoyer")
 
-        answer = result["result"]
-        sources = result["source_documents"]
+        # --- Traitement de la question (inchangé) ---
+        if submitted and user_input:
+            st.session_state.messages.append(
+                {"role": "user", "content": user_input}
+            )
 
-        st.session_state.messages.append(
-            {"role": "assistant", "content": answer}
-        )
+            rag = get_rag_chain()
 
-        st.session_state.last_sources = sources
-        st.rerun()
+            with st.spinner("Analyse des documents…"):
+                result = rag({"query": user_input})
 
-    # Sources
+            answer = result["result"]
+            sources = result["source_documents"]
+
+            st.session_state.messages.append(
+                {"role": "assistant", "content": answer}
+            )
+
+            st.session_state.last_sources = sources
+            st.rerun()
+
+    # --- Sources (Restent à l'extérieur, sous le Chat) ---
+    # Le expander pour les sources est généralement mieux en dehors du expander principal
+    # du chat pour ne pas le surcharger visuellement.
     if "last_sources" in st.session_state:
         with st.expander("📚 Sources utilisées"):
             for doc in st.session_state.last_sources:
+                # Ajout d'une ligne pour séparer les sources pour plus de clarté
+                st.markdown("---") 
                 st.markdown(f"- **Source** : {doc.metadata.get('source')}")
                 st.code(doc.page_content[:400])

@@ -6,3 +6,4 @@ poetry.lock
 logs
 __pycache__
 dev
+chat_box_olds.py

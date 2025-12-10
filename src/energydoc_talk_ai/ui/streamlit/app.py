@@ -29,7 +29,7 @@ def main():
     if st.session_state.flag_uploaded_pdfs:
         render_ingestion_button()
 
-    if st.session_state.ingestion_done:
+    if st.session_state.ingestion_done or st.session_state.flag_index_exists:
         render_chat_box()
 
 

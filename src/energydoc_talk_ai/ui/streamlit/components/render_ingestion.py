@@ -16,6 +16,7 @@ def render_ingestion_button():
                     pdfs_ram = [(f.name, f.read()) for f in st.session_state.uploaded_pdfs]
                     ingestion_pipeline_ram(pdfs_ram)
                     st.session_state.ingestion_done = True
+                    st.session_state.flag_index_exists = True
                     st.success("Ingestion terminée ✅")
             except Exception as e:
                 st.error(f"Erreur durant l'ingestion : {e}")
